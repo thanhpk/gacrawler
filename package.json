@@ -1,0 +1,23 @@
+{
+  "name": "gacrawler",
+  "version": "1.0.0",
+  "description": "get some data from ga",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thanhpk/gacrawler.git"
+  },
+  "author": "Pham Kieu Thanh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thanhpk/gacrawler/issues"
+  },
+  "homepage": "https://github.com/thanhpk/gacrawler#readme",
+  "dependencies": {
+    "googleapis": "^12.4.0",
+    "q": "^1.4.1"
+  }
+}
