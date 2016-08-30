@@ -1,9 +1,7 @@
 (function(){
 	'use strict';
 	var Q = require('q');
-	var google = require('googleapis.js');
-
-	//var viewID = 'ga:106358211'; // Google Analytics view ID
+	var google = require('googleapis');
 
 	function auth(clientEmail, privateKey, cb)
 	{
@@ -12,14 +10,14 @@
 			if (err) {
 				return cb(err, null);
       }
-			return cb(jwtClient);
+			return cb(null, jwtClient);
 		});
 	}
 
-	function query(viewId, clientEmail, privateKey, url, startdate, enddate) {
+	exports.queryPageviewAndUniqueVisitors = function(viewId, clientEmail, privateKey, url, startdate, enddate) {
 
 		var deferred = Q.defer();
-		auth(viewId, clientEmail, privateKey, function(err, jwtClient) {
+		auth(clientEmail, privateKey, function(err, jwtClient) {
 			if (err)
 				return deferred.reject(err);
 
@@ -32,27 +30,25 @@
 				'dimensions': 'ga:pagePath',
 				'start-date': startdate,
 				'end-date': enddate,
-				'filters': 'ga:pagePath=' + url
+				'filters': 'ga:pagePath==' + url
 			}, function (err, response) {
 				if (err) {
 					return deferred.reject(err);
 				}
-
-				var pageViews = response.totalsForAllResults['ga:pageviews'];
+				var pageViews = response.totalsForAllResults['ga:pageViews'];
 				analytics.data.ga.get({
 					'auth': jwtClient,
 					'ids': viewId,
-					'metrics': 'ga:pageViews',
+					'metrics': 'ga:Users',
 					'dimensions': 'ga:pagePath',
 					'start-date': startdate,
 					'end-date': enddate,
-					'filters': 'ga:pagePath=' + url
+					'filters': 'ga:pagePath==' + url
 				}, function (err, response) {
 					if (err) {
 						return deferred.reject(err);
 					}
-
-					var uniqueUsers = response.totalsForAllResults['ga:users'];
+					var uniqueUsers = response.totalsForAllResults['ga:Users'];
 					deferred.resolve({totalPageviews: pageViews, totalUniqueUsers: uniqueUsers});
 				});
 			});
