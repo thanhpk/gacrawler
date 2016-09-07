@@ -10,8 +10,27 @@ npm install gacrawler --save
 
 # Usage
 
+First, register you environment variables
+```shell
+$ export GOOGLE_SERICES_EMAIL=*****@developer.gserviceaccount.com
+$ export GA_VIEWID=my-bucket
+$ export GCS_PRIVATE_KEY=`cat path/to/google-services-private-key.pem`
+```
+
+Then, crawl data using `queryPageviewAndUniqueVisitors`
 ```js
-var crawler = require('gacrawler');
+var gaCrawler = require('gacrawler');
+var crawler = new gaCrawler.gaCrawler();
+crawler.queryPageviewAndUniqueVisitors('/','2016-06-01', '2016-06-15').then(function(data){
+	console.log(data); //output: { totalPageviews: '208873', totalUniqueUsers: '28157' }
+}).catch(function(err){
+	console.log(err);
+});
+```
+
+Alternatively, you can set authentication manually using
+```js
+var gaCrawler = require('gacrawler');
 
 var VIEWID = 'ga:106358211';
 var clientEmail = '123-iecokshs@developer.gserviceaccount.com';
@@ -43,7 +62,9 @@ vfjDa0D/JKd3RUQqgkMfm8oGk/u9uYxMkqqhbEMeJYaNlKBcTeyDLkbYr1w3TynB\n\
 2+KhqQReUagY2HQixDJj4Pds99Jf5dIQAdpTvJo1BQR5fu5T/pScI6J=\n\
 -----END RSA PRIVATE KEY-----';
 
-crawler.queryPageviewAndUniqueVisitors(VIEWID, clientEmail, privateKey,'/','2016-06-01', '2016-06-15').then(function(data){
+var crawler = new new gaCrawler.gaCrawler(VIEWID, clientEmail, privateKey);
+
+crawler.queryPageviewAndUniqueVisitors('/','2016-06-01', '2016-06-15').then(function(data){
 	console.log(data); //output: { totalPageviews: '208873', totalUniqueUsers: '28157' }
 }).catch(function(err){
 	console.log(err);
