@@ -28,6 +28,8 @@ crawler.queryPageviewAndUniqueVisitors('/','2016-06-01', '2016-06-15').then(func
 });
 ```
 
+If gaCrawler receives a RateLimited error from Google, it will retries until the correct data is returned.
+
 Alternatively, you can set authentication manually using
 ```js
 var gaCrawler = require('gacrawler');
@@ -83,7 +85,30 @@ View ID
 106358211
 ```
 *Note, you have to add 'ga:' prefix into view id before pass it in the 
-queryPageviewAndUniqueVisitors, it will look like query.queryPageviewAndUniqueVisitors('ga:106358211',..) *
+queryPageviewAndUniqueVisitors, it will look like query.queryPageviewAndUniqueVisitors('ga:106358211',..)*
+
+You can do batch query like this
+```js
+crawler.batchQueryPageviewAndUniqueVisitors(['/','/2','/3'],'2016-06-01', '2016-06-15').then(function(data){
+	console.log(data); 
+	//output: [
+	//{ url: '/', totalPageviews: '203', totalUniqueUsers: '287' },
+	//{ url: '/2', totalPageviews: '2873', totalUniqueUsers: '257' },
+	//{ url: '/3', totalPageviews: '2083', totalUniqueUsers: '287' }
+	//]
+})'
+```
+
+It will return an array contains the output which order is exactly the same as the input urls. 
+If there is an error, the function will try to pass err in the array, for examples, an output with error will look like:
+
+```javascript
+output: [
+{ url: '/', totalPageviews: '203', totalUniqueUsers: '287' },
+{ err: {message: "error"} },
+{ url: '/3', totalPageviews: '2083', totalUniqueUsers: '287' }
+]
+```
 
 # Test
 
