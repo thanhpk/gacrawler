@@ -10,6 +10,7 @@ npm install gacrawler --save
 
 # Usage
 
+## Single request
 First, register you environment variables
 ```shell
 $ export GOOGLE_SERICES_EMAIL=*****@developer.gserviceaccount.com
@@ -27,6 +28,8 @@ crawler.queryPageviewAndUniqueVisitors('/','2016-06-01', '2016-06-15').then(func
 	console.log(err);
 });
 ```
+
+If gaCrawler receives a RateLimited error from Google, it will retries until the correct data is returned.
 
 Alternatively, you can set authentication manually using
 ```js
@@ -75,7 +78,7 @@ gacrawler first will try to authorizate using clientEmail and privateKey,
 you can get these information by creating new credential at
 [https://console.developers.google.com/apis/credentials](https://console.developers.google.com/apis/credentials)
 
-It will need your GA view id as well, to get it, login to Google Analytics,
+It also need your GA view id, to get it, login to Google Analytics,
 go to menu `ADMIN`, you will see the `view setting` on the third column, 
 click to the menu and it will show you your view id, example 
 ```
@@ -83,7 +86,35 @@ View ID
 106358211
 ```
 *Note, you have to add 'ga:' prefix into view id before pass it in the 
-queryPageviewAndUniqueVisitors, it will look like query.queryPageviewAndUniqueVisitors('ga:106358211',..) *
+queryPageviewAndUniqueVisitors, it will look like query.queryPageviewAndUniqueVisitors('ga:106358211',..)*
+
+## Batch query
+You can do batch query like this
+```js
+crawler.batchQueryPageviewAndUniqueVisitors(['/','/2','/3'],'2016-06-01', '2016-06-15').then(function(data){
+	console.log(data); 
+	//output: [
+	//{ url: '/', totalPageviews: '203', totalUniqueUsers: '287' },
+	//{ url: '/2', totalPageviews: '2873', totalUniqueUsers: '257' },
+	//{ url: '/3', totalPageviews: '2083', totalUniqueUsers: '287' }
+	//]
+});
+```
+
+It will return an array contains the output which order is exactly the 
+same as the input urls. 
+
+If there is an error, the function will try to pass err in the array, so
+ you don't have to add catch statement for batch query. For examples, an 
+ output with error will look like:
+
+```javascript
+output: [
+{ url: '/', totalPageviews: '203', totalUniqueUsers: '287' },
+{ err: {message: "error"} },
+{ url: '/3', totalPageviews: '2083', totalUniqueUsers: '287' }
+]
+```
 
 # Test
 
