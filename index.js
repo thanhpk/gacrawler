@@ -29,6 +29,14 @@ function GaCrawler(viewId, clientEmail, privateKey) {
 		});
 	}
 
+	function isRetryError(err) {
+		var reasons = ['userRateLimitExceeded', 'userRateLimitExceeded', 'quotaExceeded'];
+		if (err.code === 403 && err.errors && err.errors[0] && reasons.indexOf(err.errors[0].reason) !== -1 ) {
+			return true;
+		}
+		return false;
+	}
+
 	function queryPageview(url, startdate, enddate, nTry) {
 		var deferred = Q.defer();
 		lock('auth', function(release){
@@ -46,14 +54,17 @@ function GaCrawler(viewId, clientEmail, privateKey) {
 				'filters': 'ga:pagePath==' + url
 			}, function (err, response) {
 				if (err) {
-					if (err.code === 403 && err.errors && err.errors[0] && err.errors[0].reason === 'userRateLimitExceeded') {
+					if (isRetryError(err)) {
 						// keep try again
-						return queryPageview(url, startdate, enddate)
-						.then(function(data){
-							deferred.resolve(data);
-						}).catch(function(data){
-							deferred.reject(data);
-						});
+						setTimeout(function(){
+							queryPageview(url, startdate, enddate)
+								.then(function(data){
+									deferred.resolve(data);
+								}).catch(function(data){
+								deferred.reject(data);
+							})
+						}, Math.random() * 100);
+						return;
 					}
 					if (nTry === undefined) {
 						// try to authenticate again
@@ -91,14 +102,16 @@ function GaCrawler(viewId, clientEmail, privateKey) {
 				'filters': 'ga:pagePath==' + url
 			}, function (err, response) {
 				if (err) {
-					if (err.code === 403 && err.errors && err.errors[0] && err.errors[0].reason === 'userRateLimitExceeded') {
-						// keep try again
-						return queryUniqueVisitor(url, startdate, enddate)
-						.then(function(data){
-							deferred.resolve(data);
-						}).catch(function(data){
-							deferred.reject(data);
-						});
+					if (isRetryError(err)) {
+						setTimeout(function(){
+							queryPageview(url, startdate, enddate)
+									.then(function(data){
+									deferred.resolve(data);
+								}).catch(function(data){
+								deferred.reject(data);
+							})
+						}, Math.random() * 100);
+						return;
 					}
 					if (nTry === undefined) {
 						// try to authenticate again
@@ -119,7 +132,7 @@ function GaCrawler(viewId, clientEmail, privateKey) {
 		return deferred.promise;
 	}
 
-	function queryPageviewAndUniqueVisitor(url, startdate, enddate, nTry) {
+	function queryPageviewAndUniqueVisitor(url, startdate, enddate) {
 		var deferred = Q.defer();
 		queryPageview(url, startdate, enddate).then(function(pageViews){
 			queryUniqueVisitor(url, startdate, enddate).then(function(uniqueVisitors){
@@ -134,8 +147,31 @@ function GaCrawler(viewId, clientEmail, privateKey) {
 		return deferred.promise;
 	}
 
-	function batchQueryPageviewAndUniqueVisitor(urls, startdate, enddate, nTry) {
-		
+	function batchQueryPageviewAndUniqueVisitor(urls, startdate, enddate) {
+		var deferred = Q.defer();
+		var count = urls.length;
+		var results = [];
+		for(var i in urls) if (urls.hasOwnProperty(i)) {
+			var url = urls[i];
+			(function(i){
+				queryPageviewAndUniqueVisitor(url, startdate, enddate).then(function(output){
+					output.url = urls[i];
+					results[i] = output;
+
+					count--;
+					if(count == 0)
+						return deferred.resolve(results);
+
+				}).catch(function(err){
+					results[i] = {err: err.errors[0].reason};
+
+					count--;
+					if(count == 0)
+						return deferred.resolve(results);
+				});
+			})(i);
+		}
+		return deferred.promise;
 	}
 
 	auth(clientEmail, privateKey);

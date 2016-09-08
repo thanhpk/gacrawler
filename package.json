@@ -1,6 +1,6 @@
 {
   "name": "gacrawler",
-  "version": "1.0.2",
+  "version": "1.1.1",
   "description": "get some data from ga",
   "main": "index.js",
   "scripts": {
@@ -16,6 +16,9 @@
     "url": "https://github.com/thanhpk/gacrawler/issues"
   },
   "homepage": "https://github.com/thanhpk/gacrawler#readme",
+  "engines": {
+    "node": ">=0.4.0"
+  },
   "dependencies": {
     "googleapis": "^12.4.0",
     "lock": "^0.1.3",
