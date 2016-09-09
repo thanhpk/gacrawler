@@ -78,7 +78,7 @@ function GaCrawler(viewId, clientEmail, privateKey) {
 						return deferred.reject(err);
 					}
 				}
-				var pageViews = response.totalsForAllResults['ga:pageViews'];
+				var pageViews = parseInt(response.totalsForAllResults['ga:pageViews']);
 				deferred.resolve(pageViews);
 			});
 		});
@@ -140,7 +140,7 @@ function GaCrawler(viewId, clientEmail, privateKey) {
 						return deferred.reject(err);
 					}
 				}
-					var uniqueUsers = response.totalsForAllResults['ga:Users'];
+					var uniqueUsers = parseInt(response.totalsForAllResults['ga:Users']);
 					deferred.resolve(uniqueUsers);
 			});
 		});
