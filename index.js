@@ -85,8 +85,23 @@ function GaCrawler(viewId, clientEmail, privateKey) {
 		return deferred.promise;
 	}
 
+	function convertDateToString(date) {
+		var year = date.getYear() + 1900;
+		var month = date.getMonth() + 1;
+		var day = date.getDate();
+		if(month < 10) month = '0' + month;
+		if(day < 10) day = '0' + day;
+
+		return year + '-' + month + '-' + day;
+	}
+
 	function queryUniqueVisitor(url, startdate, enddate, nTry) {
 		var deferred = Q.defer();
+		if (typeof startdate !== 'string')
+			startdate = convertDateToString(startdate);
+		if (typeof enddate !== 'string')
+			enddate = convertDateToString(enddate);
+
 		lock('auth', function(release){
 			release()();
 			if (!jwtClient)
@@ -151,6 +166,11 @@ function GaCrawler(viewId, clientEmail, privateKey) {
 		var deferred = Q.defer();
 		var count = urls.length;
 		var results = [];
+		if (typeof startdate !== 'string')
+			startdate = convertDateToString(startdate);
+		if (typeof enddate !== 'string')
+			enddate = convertDateToString(enddate);
+
 		for(var i in urls) if (urls.hasOwnProperty(i)) {
 			var url = urls[i];
 			(function(i){
