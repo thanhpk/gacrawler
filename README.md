@@ -22,7 +22,11 @@ Then, crawl data using `queryPageviewAndUniqueVisitors`
 ```js
 var gaCrawler = require('gacrawler');
 var crawler = new gaCrawler.gaCrawler();
-crawler.queryPageviewAndUniqueVisitors('/','2016-06-01', '2016-06-15').then(function(data){
+
+var startdate = '2016-06-15';
+var enddate = new Date();
+
+crawler.queryPageviewAndUniqueVisitors('/', startdate, enddate).then(function(data){
 	console.log(data); //output: { totalPageviews: '208873', totalUniqueUsers: '28157' }
 }).catch(function(err){
 	console.log(err);
@@ -89,9 +93,10 @@ View ID
 queryPageviewAndUniqueVisitors, it will look like query.queryPageviewAndUniqueVisitors('ga:106358211',..)*
 
 ## Batch query
-You can do batch query like this
+You can do batch query by calling `batchQueryPageviewAndUniqueVisitors`, parameters is the same as 
+`queryPageviewAndUniqueVisitors`, except for the first parameter, it instead takes an arrays of urls. 
 ```js
-crawler.batchQueryPageviewAndUniqueVisitors(['/','/2','/3'],'2016-06-01', '2016-06-15').then(function(data){
+crawler.batchQueryPageviewAndUniqueVisitors(['/','/2','/3'], '2016-06-01', '2016-06-15').then(function(data){
 	console.log(data); 
 	//output: [
 	//{ url: '/', totalPageviews: '203', totalUniqueUsers: '287' },
@@ -101,7 +106,7 @@ crawler.batchQueryPageviewAndUniqueVisitors(['/','/2','/3'],'2016-06-01', '2016-
 });
 ```
 
-It will return an array contains the output which order is exactly the 
+Output alway is an array contains the output which order is exactly the 
 same as the input urls. 
 
 If there is an error, the function will try to pass err in the array, so
