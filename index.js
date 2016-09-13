@@ -14,7 +14,7 @@ function GaCrawler(viewId, clientEmail, privateKey) {
 
 	function auth(clientEmail, privateKey, cb) {
 		if (!clientEmail || !privateKey)
-			throw "clientEmail and privateKey not set";
+			console.log('ERROR: gacrawler: clientEmail or privateKey not set');
 		lock('auth', function(release) {
 			try {
 				var client = new google.auth.JWT(clientEmail, null, privateKey, ['https://www.googleapis.com/auth/analytics.readonly'], null);
