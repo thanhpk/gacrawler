@@ -148,6 +148,7 @@ function GaCrawler(viewId, clientEmail, privateKey) {
 	}
 
 	function queryPageviewAndUniqueVisitor(url, startdate, enddate) {
+		url = decodeURIComponent(url);
 		var deferred = Q.defer();
 		queryPageview(url, startdate, enddate).then(function(pageViews){
 			queryUniqueVisitor(url, startdate, enddate).then(function(uniqueVisitors){
@@ -172,7 +173,7 @@ function GaCrawler(viewId, clientEmail, privateKey) {
 			enddate = convertDateToString(enddate);
 
 		for(var i in urls) if (urls.hasOwnProperty(i)) {
-			var url = urls[i];
+			var url = decodeURIComponent(urls[i]);
 			(function(i){
 				queryPageviewAndUniqueVisitor(url, startdate, enddate).then(function(output){
 					output.url = urls[i];
@@ -196,7 +197,6 @@ function GaCrawler(viewId, clientEmail, privateKey) {
 
 	auth(clientEmail, privateKey);
 	this.queryPageviewAndUniqueVisitors = queryPageviewAndUniqueVisitor;
-
 	this.batchQueryPageviewAndUniqueVisitors = batchQueryPageviewAndUniqueVisitor;
 }
 
